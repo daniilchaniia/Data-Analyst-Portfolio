@@ -1,0 +1,137 @@
+SELECT * FROM user_events;
+--funnel stages 
+WITH funnel_stages AS (
+SELECT 
+COUNT(event_type) FILTER (WHERE event_type = 'page_view') AS view_page,
+COUNT(event_type) FILTER (WHERE event_type = 'add_to_cart') AS add_to_cart,
+COUNT(event_type) FILTER (WHERE event_type = 'checkout_start') AS checkout,
+count(event_type) FILTER (WHERE event_type = 'payment_info') AS payment,
+COUNT(event_type) FILTER (WHERE event_type = 'purchase') AS purchase
+FROM  user_events )
+SELECT * FROM funnel_stages;
+
+WITH funnel_stages AS (
+    SELECT 
+    COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN user_id END) AS stage1_view_page,
+    COUNT(DISTINCT CASE WHEN event_type = 'add_to_cart' THEN user_id END) AS stage2_cart,
+    COUNT(DISTINCT CASE WHEN event_type = 'checkout_start' THEN user_id END) AS stage3_checkout,
+    COUNT(DISTINCT CASE WHEN event_type = 'payment_info' THEN user_id END) AS stage4_payment,
+    COUNT(DISTINCT CASE WHEN event_type = 'purchase' THEN user_id END) AS stage5_purchase
+    FROM  user_events 
+    --WHERE event_date BETWEEN '2025-02-01' AND '2025-12-31'
+)
+SELECT * FROM funnel_stages; 
+
+--funnel conversion rates
+WITH funnel_stages AS (
+    SELECT 
+    COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN user_id END) AS stage1_view_page,
+    COUNT(DISTINCT CASE WHEN event_type = 'add_to_cart' THEN user_id END) AS stage2_cart,
+    COUNT(DISTINCT CASE WHEN event_type = 'checkout_start' THEN user_id END) AS stage3_checkout,
+    COUNT(DISTINCT CASE WHEN event_type = 'payment_info' THEN user_id END) AS stage4_payment,
+    COUNT(DISTINCT CASE WHEN event_type = 'purchase' THEN user_id END) AS stage5_purchase
+    FROM  user_events 
+    --WHERE event_date BETWEEN '2025-02-01' AND '2025-12-31'
+)
+SELECT 
+stage1_view_page,
+stage2_cart,
+TRUNC((stage2_cart * 1.0 / stage1_view_page) * 100, 2) AS view_to_cart,
+stage3_checkout,
+TRUNC((stage3_checkout * 1.0 / stage2_cart) * 100, 2) AS cart_to_checkout,
+stage4_payment,
+TRUNC((stage4_payment * 1.0 / stage3_checkout) * 100, 2) AS checkout_to_payment,
+stage5_purchase,
+TRUNC((stage5_purchase * 1.0 / stage4_payment) * 100, 2) AS payment_to_purchase,
+TRUNC((stage5_purchase * 1.0 / stage1_view_page) * 100, 2) AS overall_conversion
+FROM funnel_stages; 
+
+--source of traffic to view
+WITH traffic_an AS (
+SELECT
+COUNT(event_type) FILTER (WHERE event_type = 'page_view') AS overall_views,
+COUNT(event_type) FILTER (WHERE event_type = 'page_view' AND traffic_source = 'organic') AS organic_views,
+COUNT(event_type) FILTER (WHERE event_type = 'page_view' AND traffic_source = 'email') AS email_views,
+COUNT(event_type) FILTER (WHERE event_type = 'page_view' AND traffic_source = 'social') AS social_views,
+COUNT(event_type) FILTER (WHERE event_type = 'page_view' AND traffic_source = 'paid_ads') AS paid_views
+FROM user_events
+)
+SELECT 
+overall_views,
+organic_views,
+TRUNC((organic_views * 1.0 / overall_views) * 100, 2) AS organic_percentage,
+email_views,
+TRUNC((email_views * 1.0 / overall_views) * 100, 2) AS email_percentage,
+social_views,
+TRUNC((social_views * 1.0 / overall_views) * 100, 2) AS social_percentage,
+paid_views,
+TRUNC((paid_views * 1.0 / overall_views) * 100, 2) AS paid_percentage
+FROM traffic_an;
+
+--distinct event counts by traffic source
+WITH traffic_by_stage AS (
+    SELECT 
+    traffic_source,
+    COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN user_id END) AS view_page,
+    COUNT(DISTINCT CASE WHEN event_type = 'add_to_cart' THEN user_id END) AS add_to_cart,
+    COUNT(DISTINCT CASE WHEN event_type = 'purchase' THEN user_id END) AS purchase
+    FROM  user_events
+    GROUP BY traffic_source
+)
+SELECT * FROM traffic_by_stage;
+
+WITH conversion_by_stage AS (
+    SELECT 
+    traffic_source,
+    COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN user_id END) AS view_page,
+    COUNT(DISTINCT CASE WHEN event_type = 'add_to_cart' THEN user_id END) AS add_to_cart,
+    COUNT(DISTINCT CASE WHEN event_type = 'purchase' THEN user_id END) AS purchase
+    FROM  user_events
+    GROUP BY traffic_source
+)
+SELECT 
+traffic_source,
+view_page,
+add_to_cart,
+TRUNC((add_to_cart * 1.0 / view_page) * 100, 2) AS view_to_cart_conversion,
+add_to_cart,
+purchase,
+TRUNC((purchase * 1.0 / add_to_cart) * 100, 2) AS cart_to_purchase_conversion
+FROM conversion_by_stage;
+
+--time to conversion analysis
+WITH user_journey AS (
+    SELECT 
+    user_id,
+    MIN(CASE WHEN event_type = 'page_view' THEN event_date END) AS view_time,
+    MIN(CASE WHEN event_type = 'add_to_cart' THEN event_date END) AS to_cart_time,
+    MIN(CASE WHEN event_type = 'purchase' THEN event_date END) AS purchase_time
+    FROM  user_events
+    GROUP BY user_id
+    HAVING   MIN(CASE WHEN event_type = 'purchase' THEN event_date END) IS NOT NULL
+)
+SELECT 
+  COUNT(*) AS total_converted_users,
+  ROUND(AVG(EXTRACT(EPOCH FROM (to_cart_time - view_time)) / 60), 2) AS avg_time_to_cart,
+  ROUND(AVG(EXTRACT(EPOCH FROM (purchase_time - to_cart_time)) / 60), 2) AS avg_time_cart_to_purchase,
+  ROUND(AVG(EXTRACT(EPOCH FROM (purchase_time - view_time)) / 60), 2) AS avg_time_view_to_purchase
+FROM user_journey;
+
+--REVENUE ANALYSIS
+WITH funnel_revenue AS (
+SELECT
+    COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN user_id END) AS total_visitors,
+    COUNT(DISTINCT CASE WHEN event_type = 'purchase' THEN user_id END) AS total_purchasers,
+    SUM(CASE WHEN event_type = 'purchase' THEN amount END) AS total_revenue,
+    COUNT(CASE WHEN event_type = 'purchase' THEN 1 END) AS total_orders
+FROM user_events
+)
+SELECT 
+total_visitors,
+total_purchasers,
+total_revenue,
+total_orders,
+ROUND(total_revenue/total_orders, 2) AS revenue_to_order_ratio,
+ROUND(total_revenue/total_purchasers, 2) AS revenue_to_buyer_ratio,
+ROUND(total_revenue/total_visitors, 2) AS revenue_to_visitor_ratio
+FROM funnel_revenue;
