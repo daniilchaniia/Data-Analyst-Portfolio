@@ -17,7 +17,7 @@ COPY user_events (
     amount,
     traffic_source
 )
-FROM '/seed/user_events.csv'
+FROM '/data/user_events.csv'
 WITH (
     FORMAT csv,
     HEADER true
