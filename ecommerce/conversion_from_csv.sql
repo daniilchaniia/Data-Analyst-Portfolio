@@ -23,7 +23,7 @@ COPY user_events (
     amount,
     traffic_source
 )
-FROM '/seed/user_events.csv'
+FROM '/data/user_events.csv'
 WITH (
     FORMAT csv, --указываем, что файл в формате CSV
     HEADER true --пропускаем первую строку с названиями столбцов
