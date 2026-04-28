@@ -21,26 +21,9 @@ Portfolio of data analytics projects focused on retail sales analysis, ecommerce
 
 ## Projects
 
-### 1. Retail Sales Analytics
-Analysis of offline shoe retail sales across stores, brands, price segments, discounts, and store performance.
-
-**Business questions:**
-- Which stores underperform and why?
-- How do price bands affect sales performance?
-- Which brands and categories drive revenue?
-- How do discounts influence average check and sales volume?
-
-**Tools:** PostgreSQL, Python, pandas, Power BI, Excel  
-**Key results:**
-- Optimized weekly sales analysis workflow by improving query and aggregation logic.
-- Built store-level analysis of revenue, units sold, average check, discounts, and price-band mix.
-- Identified underperforming stores and compared them against stronger locations.
-
-[Open project](./retail)
-
 ---
 
-### 2. Ecommerce Funnel Analytics
+### 1. Ecommerce Funnel Analytics
 Analysis of user events and conversion funnel from page view to purchase.
 
 **Business questions:**
