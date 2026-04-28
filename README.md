@@ -17,25 +17,27 @@
 
 # Data Analyst Portfolio — Daniil Chaniia
 
-Portfolio of data analytics projects focused on retail sales analysis, ecommerce funnel analysis, SQL, Python, Power BI, and business reporting.
+## Ecommerce Funnel & Traffic Analytics
 
-## Projects
+Аналитический проект по исследованию эффективности ecommerce-воронки и источников трафика для сервиса онлайн-продаж.
 
----
+В проекте анализируется путь пользователя от просмотра страницы товара до покупки: `page_view → add_to_cart → checkout_start → payment_info → purchase`. На основе событийных данных рассчитаны ключевые показатели воронки: количество событий, количество уникальных пользователей на каждом этапе, конверсия между этапами, общая конверсия в покупку, эффективность traffic source и revenue-метрики.
 
-### 1. Ecommerce Funnel Analytics
-Analysis of user events and conversion funnel from page view to purchase.
+**Ключевые задачи:**
+- рассчитать ecommerce-воронку по событиям и уникальным пользователям;
+- определить этапы с наибольшей потерей пользователей;
+- сравнить эффективность каналов трафика: organic, email, social, paid_ads;
+- оценить среднее время прохождения пути от просмотра товара до покупки;
+- рассчитать выручку на заказ, покупателя и посетителя;
+- подготовить результаты для визуализации в Power BI.
 
-**Business questions:**
-- Where do users drop off in the funnel?
-- What is the conversion rate between funnel stages?
-- How do user events translate into purchases?
-- Which stages require optimization?
+**Инструменты:** PostgreSQL, SQL, Power BI, аналитика воронки продаж, продуктовые метрики.
 
-**Tools:** PostgreSQL, SQL, Python, pandas, Power BI / Streamlit  
-**Key results:**
-- Built SQL funnel queries using event-level data.
-- Compared total event counts and unique-user conversion.
-- Prepared metrics for dashboard visualization.
+**Что реализовано:**
+- SQL-запросы с `COUNT FILTER`, `COUNT DISTINCT`, `CASE WHEN`, CTE и расчетом conversion rate;
+- анализ конверсии между этапами воронки;
+- сегментация пользователей по источникам трафика;
+- расчет revenue-метрик: revenue per order, revenue per buyer, revenue per visitor;
+- Power BI-дашборд для визуального анализа воронки и эффективности трафика.
 
-[Open project](./ecommerce)
+[Открыть проект](./ecommerce)
