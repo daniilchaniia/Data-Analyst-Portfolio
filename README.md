@@ -14,3 +14,45 @@
 ![SQL Server](https://img.shields.io/badge/Microsoft_SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
 ![GITHUB ACTIONS](https://img.shields.io/badge/Github%20Actions-282a2e?style=for-the-badge&logo=githubactions&logoColor=367cfe)
 ![WINDOWS TERMINAL](https://img.shields.io/badge/windows%20terminal-4D4D4D?style=for-the-badge&logo=windows%20terminal&logoColor=white)
+
+# Data Analyst Portfolio — Daniil Chaniia
+
+Portfolio of data analytics projects focused on retail sales analysis, ecommerce funnel analysis, SQL, Python, Power BI, and business reporting.
+
+## Projects
+
+### 1. Retail Sales Analytics
+Analysis of offline shoe retail sales across stores, brands, price segments, discounts, and store performance.
+
+**Business questions:**
+- Which stores underperform and why?
+- How do price bands affect sales performance?
+- Which brands and categories drive revenue?
+- How do discounts influence average check and sales volume?
+
+**Tools:** PostgreSQL, Python, pandas, Power BI, Excel  
+**Key results:**
+- Optimized weekly sales analysis workflow by improving query and aggregation logic.
+- Built store-level analysis of revenue, units sold, average check, discounts, and price-band mix.
+- Identified underperforming stores and compared them against stronger locations.
+
+[Open project](./retail)
+
+---
+
+### 2. Ecommerce Funnel Analytics
+Analysis of user events and conversion funnel from page view to purchase.
+
+**Business questions:**
+- Where do users drop off in the funnel?
+- What is the conversion rate between funnel stages?
+- How do user events translate into purchases?
+- Which stages require optimization?
+
+**Tools:** PostgreSQL, SQL, Python, pandas, Power BI / Streamlit  
+**Key results:**
+- Built SQL funnel queries using event-level data.
+- Compared total event counts and unique-user conversion.
+- Prepared metrics for dashboard visualization.
+
+[Open project](./ecommerce)
