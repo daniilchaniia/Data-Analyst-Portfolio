@@ -9,7 +9,7 @@
 ![MS Excel](https://img.shields.io/badge/MS_Excel-217346?style=for-the-badge&logo=microsoft-excel&logoColor=white)
 ![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
-# Data Analyst Portfolio — Daniil Chaniia
+# Портфолио Чания Даниил
 
 ## Воронка онлайн продаж и анализ эффективности трафика
 
