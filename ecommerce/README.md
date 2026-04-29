@@ -205,9 +205,9 @@
 
 ### Файлы проекта
 
-- [Power BI dashboard PDF](./power_bi/ecommerce_dashboard.pdf)
-- [Power BI report PBIX](./power_bi/ecommerce_dashboard.pbix)
-- [SQL analysis file](./sql/ga.sql)
+- [Power BI dashboard PDF](./ecommerce_dashboard.pdf)
+- [Power BI report PBIX](./ecommerce_dashboard.pbix)
+- [SQL analysis file](./ga.sql)
 
 ## Структура проекта
 
