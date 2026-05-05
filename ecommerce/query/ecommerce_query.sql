@@ -1,5 +1,6 @@
-SELECT * FROM user_events;
---funnel stages 
+
+--Этапы воронки продаж
+--Варианит 1: Подсчет общего количества событий на каждом этапе воронки
 WITH funnel_stages AS (
 SELECT 
 COUNT(event_type) FILTER (WHERE event_type = 'page_view') AS view_page,
@@ -10,6 +11,7 @@ COUNT(event_type) FILTER (WHERE event_type = 'purchase') AS purchase
 FROM  user_events )
 SELECT * FROM funnel_stages;
 
+--Вариант 2: Подсчет количества уникальных пользователей на каждом этапе воронки
 WITH funnel_stages AS (
     SELECT 
     COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN user_id END) AS stage1_view_page,
@@ -18,11 +20,10 @@ WITH funnel_stages AS (
     COUNT(DISTINCT CASE WHEN event_type = 'payment_info' THEN user_id END) AS stage4_payment,
     COUNT(DISTINCT CASE WHEN event_type = 'purchase' THEN user_id END) AS stage5_purchase
     FROM  user_events 
-    --WHERE event_date BETWEEN '2025-02-01' AND '2025-12-31'
 )
 SELECT * FROM funnel_stages; 
 
---funnel conversion rates
+--Конверсия уникальных пользователей между этапами воронки
 WITH funnel_stages AS (
     SELECT 
     COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN user_id END) AS stage1_view_page,
@@ -31,7 +32,6 @@ WITH funnel_stages AS (
     COUNT(DISTINCT CASE WHEN event_type = 'payment_info' THEN user_id END) AS stage4_payment,
     COUNT(DISTINCT CASE WHEN event_type = 'purchase' THEN user_id END) AS stage5_purchase
     FROM  user_events 
-    --WHERE event_date BETWEEN '2025-02-01' AND '2025-12-31'
 )
 SELECT 
 stage1_view_page,
@@ -46,7 +46,8 @@ TRUNC((stage5_purchase * 1.0 / stage4_payment) * 100, 2) AS payment_to_purchase,
 TRUNC((stage5_purchase * 1.0 / stage1_view_page) * 100, 2) AS overall_conversion
 FROM funnel_stages; 
 
---source of traffic to view
+--Источники трафика на этапе просмотра странницы товара в зависимости от типа маркетинга,
+--который привел пользователя на сайт, и их вклад в общую конверсию.
 WITH traffic_an AS (
 SELECT
 COUNT(event_type) FILTER (WHERE event_type = 'page_view') AS overall_views,
@@ -68,7 +69,8 @@ paid_views,
 TRUNC((paid_views * 1.0 / overall_views) * 100, 2) AS paid_percentage
 FROM traffic_an;
 
---distinct event counts by traffic source
+--Анализ конверсии между этапами воронки для разных источников трафика, 
+--чтобы выявить наиболее эффективные каналы привлечения пользователей.
 WITH traffic_by_stage AS (
     SELECT 
     traffic_source,
@@ -80,6 +82,7 @@ WITH traffic_by_stage AS (
 )
 SELECT * FROM traffic_by_stage;
 
+--Конверсия между этапами воронки для разных источников трафика.
 WITH conversion_by_stage AS (
     SELECT 
     traffic_source,
@@ -99,7 +102,7 @@ purchase,
 TRUNC((purchase * 1.0 / add_to_cart) * 100, 2) AS cart_to_purchase_conversion
 FROM conversion_by_stage;
 
---time to conversion analysis
+--Анализ средней продолжительности времени, которое пользователи проводят на каждом этапе воронки.
 WITH user_journey AS (
     SELECT 
     user_id,
@@ -117,7 +120,10 @@ SELECT
   ROUND(AVG(EXTRACT(EPOCH FROM (purchase_time - view_time)) / 60), 2) AS avg_time_view_to_purchase
 FROM user_journey;
 
---REVENUE ANALYSIS
+--Анализ воронки дохода. 
+--Подсчет количесства уникальных пользователейб посетивших сайтю
+--Подсчет количества уникальных пользователей, совершивших покупку.
+--Подсчет суммарного дохода, расчет коэффициентов ссотношения дохода к количеству заказов, покупателям и посетителям.
 WITH funnel_revenue AS (
 SELECT
     COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN user_id END) AS total_visitors,
